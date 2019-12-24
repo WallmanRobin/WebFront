@@ -30,25 +30,23 @@
       </el-table-column>
       <el-table-column label="动作" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-button v-if="row.parent==undefined" v-waves icon="el-icon-plus" type="primary" size="mini" @click="handleAddRole(row)" />
-          <el-button v-if="row.parent==undefined" v-waves icon="el-icon-minus" type="danger" size="mini" @click="handleRemoveRole(row)" />
+          <el-button v-if="row.parent==undefined" icon="el-icon-plus" type="primary" size="mini" @click="handleAddRole(row)" />
+          <el-button v-if="row.parent==undefined" icon="el-icon-minus" type="danger" size="mini" @click="handleRemoveRole(row)" />
         </template>
       </el-table-column>
     </el-table>
     <el-dialog :title="infoDlg.title" :visible.sync="infoDlgVisible" width="30%">
       <span>{{ infoDlg.text }}</span>
       <span slot="footer" class="dialog-footer">
-        <el-button v-waves type="primary" @click="infoDlgVisible = false">确 定</el-button>
+        <el-button type="primary" @click="infoDlgVisible = false">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import waves from '@/directive/waves' // waves directive
 import { listRoles, getRoleTreeData } from '@/api/role-admin'
 export default {
-  directives: { waves },
   props: {
     roleData: {
       type: Array,

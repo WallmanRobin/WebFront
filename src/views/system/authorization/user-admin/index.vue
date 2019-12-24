@@ -3,7 +3,7 @@
     <div class="filter-container">
       <el-autocomplete v-model="listQuery.user_code" class="inline-input" :fetch-suggestions="userCodeSearch" placeholder="用户代码" @keyup.enter.native="handleFilter" />
       <el-autocomplete v-model="listQuery.name" class="inline-input" :fetch-suggestions="nameSearch" placeholder="名称" @keyup.enter.native="handleFilter" />
-      <query-btn :query-data="queryData" :labels="queryLabels" :sel-visible="selVisible" @hideSelect="hideSelect" @handleSelect="handleSelect" @handleFilter="handleFilter" />
+      <query-btn :query-data="queryData" :table-labels="queryLabels" button-label="查询" :sel-visible="selVisible" @hideSelect="hideSelect" @handleSelect="handleSelect" @handleFilter="handleFilter" />
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         新增
       </el-button>
@@ -95,8 +95,8 @@
         </span>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button v-waves type="primary" @click="handlePassword">确 定</el-button>
-        <el-button v-waves type="primary" @click="pwdDlgVisible = false">取消</el-button>
+        <el-button type="primary" @click="handlePassword">确 定</el-button>
+        <el-button type="primary" @click="pwdDlgVisible = false">取消</el-button>
       </span>
     </el-dialog>
     <el-tabs style="margin-top:15px;" type="border-card">
@@ -109,14 +109,13 @@
     <el-dialog :title="infoDlg.title" :visible.sync="infoDlgVisible" width="30%">
       <span>{{ infoDlg.text }}</span>
       <span slot="footer" class="dialog-footer">
-        <el-button v-waves type="primary" @click="infoDlgVisible = false">确 定</el-button>
+        <el-button type="primary" @click="infoDlgVisible = false">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import waves from '@/directive/waves' // waves directive
 import UserRole from './components/UserRole'
 import { getUser, listUsers, updateUser, setPassword, pushUserAvatar } from '@/api/user-admin'
 import queryBtn from '@/components/QueryBtn'
@@ -125,7 +124,6 @@ import imgPannel from '@/components/ImagePannel'
 export default {
   name: 'RoleAdmin',
   components: { UserRole: UserRole, queryBtn: queryBtn, imgPannel: imgPannel },
-  directives: { waves },
   data() {
     return {
       listQuery: {
@@ -260,7 +258,7 @@ export default {
     updateChanged() {
       this.updateDisabled = false
     },
-    notifyMessage(title, text) {
+    notifyMessage(title, text, type) {
       const h = this.$createElement
       this.$notify({
         title: title,
@@ -286,21 +284,21 @@ export default {
       } else {
         var u = { 'user_code': this.user_code, 'name': this.name, 'status': this.status, 'phone': this.phone, 'email': this.email, 'role': this.roleData }
         updateUser(u).then(response => {
-          this.notifyMessage('提示', '保存成功！')
+          this.notifyMessage('提示', '保存成功！', 'success')
         }).catch(error => {
-          this.notifyMessage('错误', '保存失败：' + error)
+          this.notifyMessage('错误', '保存失败：' + error, 'error')
         })
       }
     },
     handlePassword() {
       if (this.pwdDlg.pwd !== this.pwdDlg.confirmPwd) {
-        this.notifyMessage('错误', '两次密码不一致！')
+        this.notifyMessage('错误', '两次密码不一致！', 'error')
       } else {
         var u = { 'user_code': this.user_code, 'password': this.pwdDlg.pwd }
         setPassword(u).then(response => {
-          this.notifyMessage('提示', '密码设置成功！')
+          this.notifyMessage('提示', '密码设置成功！', 'success')
         }).catch(error => {
-          this.notifyMessage('错误', '密码设置失败：' + error)
+          this.notifyMessage('错误', '密码设置失败：' + error, 'error')
         })
         this.pwdDlgVisible = false
       }
@@ -330,9 +328,9 @@ export default {
       this.avatar = item
       if (this.user_code) {
         pushUserAvatar({ user_code: this.user_code, avatar: item }).then(response => {
-          this.notifyMessage('提示', '头像保存成功！')
+          this.notifyMessage('提示', '头像保存成功！', 'success')
         }).catch(error => {
-          this.notifyMessage('错误', '头像保存失败：' + error)
+          this.notifyMessage('错误', '头像保存失败：' + error, 'error')
         })
       }
     }

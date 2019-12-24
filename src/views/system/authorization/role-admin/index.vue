@@ -15,7 +15,7 @@
         placeholder="名称"
         @keyup.enter.native="handleFilter"
       />
-      <query-btn :query-data="queryData" :labels="queryLabels" :sel-visible="selVisible" @hideSelect="hideSelect" @handleSelect="handleSelect" @handleFilter="handleFilter" />
+      <query-btn :query-data="queryData" :table-labels="queryLabels" button-label="查询" :sel-visible="selVisible" @hideSelect="hideSelect" @handleSelect="handleSelect" @handleFilter="handleFilter" />
       <el-button
         class="filter-item"
         style="margin-left: 10px;"
@@ -34,7 +34,7 @@
           <span>
             <el-input
               v-model="code"
-              placeholder="Code"
+              placeholder="代码"
               style="width: 200px;"
               clearable
               class="filter-item"
@@ -48,7 +48,7 @@
           <span>
             <el-input
               v-model="name"
-              placeholder="Name"
+              placeholder="名称"
               style="width: 200px;"
               clearable
               class="filter-item"
@@ -101,14 +101,13 @@
     <el-dialog :title="infoDlg.title" :visible.sync="infoDlgVisible" width="30%">
       <span>{{ infoDlg.text }}</span>
       <span slot="footer" class="dialog-footer">
-        <el-button v-waves type="primary" @click="infoDlgVisible = false">确 定</el-button>
+        <el-button type="primary" @click="infoDlgVisible = false">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import waves from '@/directive/waves' // waves directive
 import endpoint from './components/Endpoint'
 import viewroute from './components/Viewroute'
 import queryBtn from '@/components/QueryBtn'
@@ -117,7 +116,6 @@ import { getRole, updateRole, listRoles } from '@/api/role-admin'
 export default {
   name: 'RoleAdmin',
   components: { endpoint: endpoint, viewroute: viewroute, queryBtn: queryBtn },
-  directives: { waves },
   data() {
     return {
       listQuery: {
@@ -231,9 +229,10 @@ export default {
     updateChanged() {
       this.updateDisabled = false
     },
-    notifyMessage(title, text) {
+    notifyMessage(title, text, type) {
       const h = this.$createElement
       this.$notify({
+        type: type,
         title: title,
         message: h('i', { style: 'color: teal' }, text)
       })
@@ -262,9 +261,9 @@ export default {
           'viewroute': s
         }
         updateRole(d).then(response => {
-          this.notifyMessage('提示', '保存成功！')
+          this.notifyMessage('提示', '保存成功！', 'success')
         }).catch(error => {
-          this.notifyMessage('错误', '保存失败：' + error)
+          this.notifyMessage('错误', '保存失败：' + error, 'error')
         })
       }
     },

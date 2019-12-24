@@ -71,6 +71,15 @@ service.interceptors.response.use(
           })
           break
         }
+        case 500: {
+          const m = error.response.data ? error.response.data : error.message
+          Message({
+            message: m || 'Error',
+            type: 'error',
+            duration: 5 * 1000
+          })
+          break
+        }
         default: {
           Message({
             message: error.message || 'Error',

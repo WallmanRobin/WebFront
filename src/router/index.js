@@ -101,7 +101,7 @@ export const asyncRoutes = [
   {
     path: '/system',
     component: Layout,
-    redirect: '/system/tree',
+    redirect: '/system/authorization',
     alwaysShow: true, // will always show the root menu
     name: 'System',
     meta: {
@@ -135,6 +135,38 @@ export const asyncRoutes = [
         component: () => import('@/views/system/tree-admin/index'),
         name: 'Tree',
         meta: { title: '树管理', icon: 'tree' }
+      }
+    ]
+  },
+  {
+    path: '/tool',
+    component: Layout,
+    redirect: '/tool/datatool',
+    alwaysShow: true, // will always show the root menu
+    name: 'Tool',
+    meta: {
+      title: '应用工具',
+      icon: 'tool'
+    },
+    children: [
+      {
+        path: '/tool/datatool',
+        component: () => import('@/views/system/datatool/index'),
+        redirect: '/tool/datatool/table',
+        alwaysShow: true, // will always show the root menu
+        name: 'DataTool',
+        meta: {
+          title: '数据管理',
+          icon: 'form'
+        },
+        children: [
+          {
+            path: '/tool/datatool/table',
+            component: () => import('@/views/system/datatool/table/index'),
+            name: 'TableTool',
+            meta: { title: '表管理', icon: 'table' }
+          }
+        ]
       }
     ]
   },

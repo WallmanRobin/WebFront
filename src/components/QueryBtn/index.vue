@@ -1,8 +1,8 @@
 <template>
-  <el-popover v-model="selVisible" placement="right" width="250" trigger="manual">
+  <el-popover v-model="selVisible" :placement="placement" :width="tableWidth" trigger="manual" style="overflow: auto">
     <el-table :data="queryData" highlight-current-row @current-change="handleSelect">
-      <el-table-column type="index" width="20" />
-      <el-table-column v-for="i in labels.length" :key="i-1" width="100" :label="labels[i-1]">
+      <el-table-column type="index" width="50" />
+      <el-table-column v-for="i in tableLabels.length" :key="i-1" width="columnWidth" :label="tableLabels[i-1]">
         <template slot-scope="scope">
           {{ scope.row[i-1] }}
         </template>
@@ -10,40 +10,27 @@
     </el-table>
     <el-button
       slot="reference"
-      v-waves
       class="filter-item"
       type="primary"
       icon="el-icon-search"
       @click="handleFilter"
     >
-      查询
+      {{ buttonLabel }}
     </el-button>
   </el-popover>
 </template>
 
 <script>
-import waves from '@/directive/waves'
 export default {
   name: 'QueryBtn',
-  directives: { waves },
   props: {
     queryData: { type: Array, default: function() { return [] } },
-    labels: { type: Array, default: function() { return [] } },
-    selVisible: Boolean
-  },
-  data() {
-    return {
-      infoDlg: {
-        title: undefined,
-        text: undefined
-      },
-      name: undefined,
-      oldEndpointData: null,
-      allEndpoints: null,
-      listLoading: true,
-      infoDlgVisible: false,
-      addDlgVisible: false
-    }
+    tableLabels: { type: Array, default: function() { return [] } },
+    selVisible: Boolean,
+    buttonLabel: { type: String, default: '查询' },
+    tableWidth: { type: String, default: '350' },
+    columnWidth: { type: String, default: '150' },
+    placement: { type: String, default: 'right' }
   },
   methods: {
     handleSelect(val) {

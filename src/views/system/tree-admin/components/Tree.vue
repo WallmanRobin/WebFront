@@ -25,17 +25,14 @@
     <el-dialog :title="infoDlg.title" :visible.sync="infoDlgVisible" width="30%">
       <span>{{ infoDlg.text }}</span>
       <span slot="footer" class="dialog-footer">
-        <el-button v-waves type="primary" @click="infoDlgVisible = false">确 定</el-button>
+        <el-button type="primary" @click="infoDlgVisible = false">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import waves from '@/directive/waves' // waves directive
-
 export default {
-  directives: { waves },
   props: {
     nodeData: {
       type: Array,

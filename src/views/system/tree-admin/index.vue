@@ -3,7 +3,7 @@
     <div class="filter-container">
       <el-autocomplete v-model="listQuery.tree_code" class="inline-input" :fetch-suggestions="treeCodeSearch" placeholder="代码" @keyup.enter.native="handleFilter" />
       <el-autocomplete v-model="listQuery.name" class="inline-input" :fetch-suggestions="treeNameSearch" placeholder="名称" @keyup.enter.native="handleFilter" />
-      <query-btn :query-data="queryData" :labels="queryLabels" :sel-visible="selVisible" @hideSelect="hideSelect" @handleSelect="handleSelect" @handleFilter="handleFilter" />
+      <query-btn :query-data="queryData" :table-labels="queryLabels" button-label="查询" :sel-visible="selVisible" @hideSelect="hideSelect" @handleSelect="handleSelect" @handleFilter="handleFilter" />
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         新增
       </el-button>
@@ -77,21 +77,19 @@
     <el-dialog :title="infoDlg.title" :visible.sync="infoDlgVisible" width="30%">
       <span>{{ infoDlg.text }}</span>
       <span slot="footer" class="dialog-footer">
-        <el-button v-waves type="primary" @click="infoDlgVisible = false">确 定</el-button>
+        <el-button type="primary" @click="infoDlgVisible = false">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import waves from '@/directive/waves'
 import tree from './components/Tree'
 import queryBtn from '@/components/QueryBtn'
 import { listTrees, listNodes, getTree, updateTree } from '@/api/tree-admin'
 export default {
   name: 'TreeAdmin',
   components: { tree: tree, queryBtn: queryBtn },
-  directives: { waves },
   data() {
     return {
       listQuery: {
@@ -233,9 +231,10 @@ export default {
         this.nodeList = []
       }
     },
-    notifyMessage(title, text) {
+    notifyMessage(title, text, type) {
       const h = this.$createElement
       this.$notify({
+        type: type,
         title: title,
         message: h('i', { style: 'color: teal' }, text)
       })
@@ -278,9 +277,9 @@ export default {
         'node': t
       }
       updateTree(d).then(response => {
-        this.notifyMessage('提示', '保存成功！')
+        this.notifyMessage('提示', '保存成功！', 'success')
       }).catch(error => {
-        this.notifyMessage('错误', '保存失败：' + error)
+        this.notifyMessage('错误', '保存失败：' + error, 'error')
       })
     },
     disableCreateItems(b) {
