@@ -345,3 +345,21 @@ export function removeClass(ele, cls) {
     ele.className = ele.className.replace(reg, ' ')
   }
 }
+
+export function notifyMessage(that, type, title, text) {
+  const h = that.$createElement
+  that.$notify({
+    type: type,
+    title: title,
+    message: h('i', { style: 'color: teal' }, text)
+  })
+}
+
+export function alertError(that, title, text) {
+  that.$alert(text,
+    title, {
+      confirmButtonText: '确定',
+      type: 'error'
+    }
+  )
+}

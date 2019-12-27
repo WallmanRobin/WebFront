@@ -74,12 +74,6 @@
         </keep-alive>
       </el-tab-pane>
     </el-tabs>
-    <el-dialog :title="infoDlg.title" :visible.sync="infoDlgVisible" width="30%">
-      <span>{{ infoDlg.text }}</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="infoDlgVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -87,6 +81,8 @@
 import tree from './components/Tree'
 import queryBtn from '@/components/QueryBtn'
 import { listTrees, listNodes, getTree, updateTree } from '@/api/tree-admin'
+import { notifyMessage, alertError } from '@/utils'
+
 export default {
   name: 'TreeAdmin',
   components: { tree: tree, queryBtn: queryBtn },
@@ -95,10 +91,6 @@ export default {
       listQuery: {
         tree_code: undefined,
         name: undefined
-      },
-      infoDlg: {
-        title: undefined,
-        text: undefined
       },
       tree_code: undefined,
       name: undefined,
@@ -112,7 +104,6 @@ export default {
       nodeData: [],
       nodeList: [],
       treeCodes: [],
-      infoDlgVisible: false,
       treeNames: [],
       selVisible: false,
       treeList: [],
@@ -231,14 +222,6 @@ export default {
         this.nodeList = []
       }
     },
-    notifyMessage(title, text, type) {
-      const h = this.$createElement
-      this.$notify({
-        type: type,
-        title: title,
-        message: h('i', { style: 'color: teal' }, text)
-      })
-    },
     validateTree(node) {
       if (!node.node_code) {
         return false
@@ -261,9 +244,7 @@ export default {
     },
     handleUpdate() {
       if (!this.validateNodeData()) {
-        this.infoDlg.title = 'Error'
-        this.infoDlg.text = '节点的代码为空值, ，请修改后再提交!'
-        this.infoDlgVisible = true
+        alertError(this, '错误', '节点的代码为空值, ，请修改后再提交!')
         return
       }
       var t = this.$refs.tree.nodeData[0]
@@ -277,9 +258,9 @@ export default {
         'node': t
       }
       updateTree(d).then(response => {
-        this.notifyMessage('提示', '保存成功！', 'success')
+        notifyMessage(this, 'success', '提示', '保存成功！')
       }).catch(error => {
-        this.notifyMessage('错误', '保存失败：' + error, 'error')
+        notifyMessage(this, 'error', '错误', '保存失败：' + error)
       })
     },
     disableCreateItems(b) {
@@ -289,11 +270,6 @@ export default {
     treeUpdated(nodeData) {
       this.updateDisabled = false
       this.nodeData = nodeData
-    },
-    notifyError(title, text) {
-      this.infoDlg.title = title
-      this.infoDlg.text = text
-      this.infoDlgVisible = true
     }
   }
 }

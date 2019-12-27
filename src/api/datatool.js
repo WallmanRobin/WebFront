@@ -30,9 +30,9 @@ export function getRefTable(name, descr) {
   })
 }
 
-export function jsonMappingToTable(data) {
+export function createTable(data) {
   return request({
-    url: '/datatool/jsonMappingToTable',
+    url: '/datatool/createTable',
     method: 'post',
     data: data
   })

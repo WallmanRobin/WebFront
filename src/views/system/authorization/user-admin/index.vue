@@ -106,12 +106,6 @@
         </keep-alive>
       </el-tab-pane>
     </el-tabs>
-    <el-dialog :title="infoDlg.title" :visible.sync="infoDlgVisible" width="30%">
-      <span>{{ infoDlg.text }}</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="infoDlgVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -120,6 +114,7 @@ import UserRole from './components/UserRole'
 import { getUser, listUsers, updateUser, setPassword, pushUserAvatar } from '@/api/user-admin'
 import queryBtn from '@/components/QueryBtn'
 import imgPannel from '@/components/ImagePannel'
+import { notifyMessage, alertError } from '@/utils'
 
 export default {
   name: 'RoleAdmin',
@@ -129,10 +124,6 @@ export default {
       listQuery: {
         user_code: undefined,
         name: undefined
-      },
-      infoDlg: {
-        title: undefined,
-        text: undefined
       },
       pwdDlg: {
         pwd: undefined,
@@ -157,7 +148,6 @@ export default {
       selVisible: false,
       queryData: [],
       queryLabels: [],
-      infoDlgVisible: false,
       pannelVisibe: false,
       imgBase: undefined,
       subDir: undefined,
@@ -258,13 +248,6 @@ export default {
     updateChanged() {
       this.updateDisabled = false
     },
-    notifyMessage(title, text, type) {
-      const h = this.$createElement
-      this.$notify({
-        title: title,
-        message: h('i', { style: 'color: teal' }, text)
-      })
-    },
     validateRoleData() {
       if (this.roleData.length === 1 && !this.roleData.role_code) {
         return true
@@ -278,27 +261,25 @@ export default {
     },
     handleUpdate() {
       if (!this.validateRoleData()) {
-        this.infoDlg.title = '错误'
-        this.infoDlg.text = '角色列表中存在空值，请修改后再提交!!'
-        this.infoDlgVisible = true
+        alertError(this, '错误', '角色列表中存在空值，请修改后再提交!')
       } else {
         var u = { 'user_code': this.user_code, 'name': this.name, 'status': this.status, 'phone': this.phone, 'email': this.email, 'role': this.roleData }
         updateUser(u).then(response => {
-          this.notifyMessage('提示', '保存成功！', 'success')
+          notifyMessage(this, 'success', '提示', '保存成功！')
         }).catch(error => {
-          this.notifyMessage('错误', '保存失败：' + error, 'error')
+          notifyMessage(this, 'error', '错误', '保存失败：' + error)
         })
       }
     },
     handlePassword() {
       if (this.pwdDlg.pwd !== this.pwdDlg.confirmPwd) {
-        this.notifyMessage('错误', '两次密码不一致！', 'error')
+        notifyMessage(this, 'error', '错误', '两次密码不一致！')
       } else {
         var u = { 'user_code': this.user_code, 'password': this.pwdDlg.pwd }
         setPassword(u).then(response => {
-          this.notifyMessage('提示', '密码设置成功！', 'success')
+          notifyMessage(this, 'success', '提示', '密码设置成功！')
         }).catch(error => {
-          this.notifyMessage('错误', '密码设置失败：' + error, 'error')
+          notifyMessage(this, 'error', '错误', '密码设置失败：' + error)
         })
         this.pwdDlgVisible = false
       }
@@ -328,9 +309,9 @@ export default {
       this.avatar = item
       if (this.user_code) {
         pushUserAvatar({ user_code: this.user_code, avatar: item }).then(response => {
-          this.notifyMessage('提示', '头像保存成功！', 'success')
+          notifyMessage(this, 'success', '提示', '头像保存成功！')
         }).catch(error => {
-          this.notifyMessage('错误', '头像保存失败：' + error, 'error')
+          notifyMessage(this, 'error', '错误', '头像保存失败：' + error)
         })
       }
     }

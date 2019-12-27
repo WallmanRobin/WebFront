@@ -27,31 +27,20 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog :title="infoDlg.title" :visible.sync="infoDlgVisible" width="30%">
-      <span>{{ infoDlg.text }}</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="infoDlgVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
 <script>
 import { listEndpoints, listMethods } from '@/api/role-admin'
+import { alertError } from '@/utils'
 
 export default {
   props: { endpointData: { type: Array, default: function() { return [] } }},
   data() {
     return {
-      infoDlg: {
-        title: undefined,
-        text: undefined
-      },
       name: undefined,
       oldEndpointData: null,
-      allEndpoints: null,
-      listLoading: true,
-      infoDlgVisible: false
+      allEndpoints: null
     }
   },
   mounted() {
@@ -65,18 +54,13 @@ export default {
         this.listLoading = false
       })
     },
-    showDupError(title, text) {
-      this.infoDlg.title = title
-      this.infoDlg.text = text
-      this.infoDlgVisible = true
-    },
     isDupEndpoint(row) {
       const n = row.endpoint
       const m = row.method
       const a = this.endpointData.filter(i => (i.endpoint === n && i.method === m))
       if (a.length >= 2) {
         this.endpointData = JSON.parse(JSON.stringify(this.oldEndpointData))
-        this.showDupError('错误', '后台服务列表中存在重复值，请修改后再提交!')
+        alertError(this, '错误', '后台服务列表中存在重复值，请修改后再提交!')
       }
     },
     changeEndpoint(row) {
@@ -97,7 +81,7 @@ export default {
           if (bDup) {
             this.endpointData = JSON.parse(JSON.stringify(this.oldEndpointData))
             this.updateEmit()
-            this.showDupError('错误', '后台服务列表中存在重复值，请修改后再提交!')
+            alertError(this, '错误', '后台服务列表中存在重复值，请修改后再提交!')
           } else {
             row.rule = this.allEndpoints.filter(i => i.endpoint === row.endpoint)[0].rule
             this.updateEmit()

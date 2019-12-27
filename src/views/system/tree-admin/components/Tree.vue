@@ -22,16 +22,12 @@
         </span>
       </span>
     </el-tree>
-    <el-dialog :title="infoDlg.title" :visible.sync="infoDlgVisible" width="30%">
-      <span>{{ infoDlg.text }}</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="infoDlgVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
 <script>
+import { alertError } from '@/utils'
+
 export default {
   props: {
     nodeData: {
@@ -49,14 +45,9 @@ export default {
   },
   data() {
     return {
-      infoDlg: {
-        title: undefined,
-        text: undefined
-      },
       treeProps: { children: 'children', label: 'name' },
       codes: [],
       names: [],
-      infoDlgVisible: false,
       expKey: []
     }
   },
@@ -95,11 +86,6 @@ export default {
       // 调用 callback 返回建议列表的数据
       cb(results)
     },
-    showDupError(title, text) {
-      this.infoDlg.title = title
-      this.infoDlg.text = text
-      this.infoDlgVisible = true
-    },
     recursiveTree(node, tree) {
       let r = 0
       if (node.data.node_code === tree.node_code) {
@@ -123,7 +109,7 @@ export default {
       if (this.validateNode(node, this.nodeData)) {
         node.data.node_code = undefined
         this.$refs.tree.setCurrentNode(node)
-        this.showDupError('Error', 'Duplicate roles exist, please correct it!')
+        alertError(this, '错误', '列表中有重复的节点，请修正后再提交!')
         return
       }
       const e = this.nodeList.find(i => (node.data.node_code === i.code))

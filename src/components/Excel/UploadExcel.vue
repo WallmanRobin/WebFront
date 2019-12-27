@@ -2,16 +2,18 @@
   <div>
     <input ref="excel-upload-input" class="excel-upload-input" type="file" accept=".xlsx, .xls" @change="handleClick">
     <div class="drop" @drop="handleDrop" @dragover="handleDragover" @dragenter="handleDragover">
-      Drop excel file here or
-      <el-button :loading="loading" style="margin-left:16px;" size="mini" type="primary" @click="handleUpload">
+      拖拽Excel文件到这里或者
+      <el-button :loading="loading" style="margin-left:16px;margin-right:16px;" size="mini" type="primary" @click="handleUpload">
         Browse
       </el-button>
     </div>
+
   </div>
 </template>
 
 <script>
 import XLSX from 'xlsx'
+import { notifyMessage } from '@/utils'
 
 export default {
   name: 'UploadExcel',
@@ -33,6 +35,7 @@ export default {
       this.excelData.header = header
       this.excelData.results = results
       this.onSuccess && this.onSuccess(this.excelData)
+      notifyMessage(this, 'success', '提示', '成功上传' + this.excelData.results.length + '条数据！')
     },
     handleDrop(e) {
       e.stopPropagation()
@@ -130,7 +133,7 @@ export default {
   height: 160px;
   line-height: 160px;
   margin: 0 auto;
-  font-size: 24px;
+  font-size: 20px;
   border-radius: 5px;
   text-align: center;
   color: #bbb;

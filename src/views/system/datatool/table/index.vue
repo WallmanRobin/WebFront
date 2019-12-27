@@ -111,16 +111,16 @@
           </span>
           <span>
             <el-dialog :visible.sync="uploadExcelVisible" title="导入数据">
-              <div class="app-container">
+              <div class="app-container" style="display: flex;justify-content: center;align-items: center;flex-direction: column;">
                 <upload-excel :on-success="uploadSuccess" :before-upload="beforeUpload" />
                 <div v-if="uploadTableData && uploadTableData.length>0" style="padding: 10px 0 0 10px">
                   <span>
-                    已成功导入<B>{{ uploadTableData.length }}</B>条数据。
+                    <el-checkbox v-model="truncate" style="padding:8px;">
+                      写入前删除
+                    </el-checkbox>
                   </span>
-                  <span>写入前删除</span>
-                  <el-checkbox v-model="truncate" style="padding:8px;" />
-                  <span padding="0 0 0 5px">
-                    <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="handleDumpTable">
+                  <span>
+                    <el-button class="filter-item" style="margin-left: 10px;" size="mini" type="primary" @click="handleDumpTable">
                       写入该表
                     </el-button>
                   </span>
@@ -141,12 +141,6 @@
       </el-row>
     </div>
     <columns ref="columns" :columns="columnsData" :mode="mode" @columnsUpdated="columnsUpdated" />
-    <el-dialog :title="infoDlg.title" :visible.sync="infoDlgVisible" width="30%">
-      <span>{{ infoDlg.text }}</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="infoDlgVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -156,7 +150,7 @@ import queryBtn from '@/components/QueryBtn'
 import exportFaltExcel from '@/components/Excel/ExportFlatExcel'
 import uploadExcel from '@/components/Excel/UploadExcel'
 import { listTables, getTable, updateTable, getRefTable, jsonMappingToTable, dumpTable } from '@/api/datatool'
-import { parseTime } from '@/utils'
+import { parseTime, notifyMessage, alertError } from '@/utils'
 
 export default {
   name: 'TableTool',
@@ -167,10 +161,6 @@ export default {
         name: undefined,
         descr: undefined
       },
-      infoDlg: {
-        title: undefined,
-        text: undefined
-      },
       name: undefined,
       descr: undefined,
       status: undefined,
@@ -179,7 +169,6 @@ export default {
       nameDisabled: true,
       columnsData: undefined,
       tablesData: undefined,
-      infoDlgVisible: false,
       tableNames: undefined,
       tableDescrs: undefined,
       tables: [],
@@ -195,7 +184,7 @@ export default {
       uploadExcelVisible: false,
       uploadTableData: [],
       uploadTableHeader: [],
-      truncate: true
+      truncate: false
     }
   },
   mounted() {
@@ -311,25 +300,17 @@ export default {
     updateChanged() {
       this.updateDisabled = false
     },
-    notifyMessage(title, text, type) {
-      const h = this.$createElement
-      this.$notify({
-        type: type,
-        title: title,
-        message: h('i', { style: 'color: teal' }, text)
-      })
-    },
     validateTableData() {
       let a = this.columnsData.filter(i => (i.name === undefined || i.name === ''))
       if (a.length > 0) {
         this.$refs.columns.$refs.table.setCurrentRow(a[0])
-        this.notifyError('数据列列表中存在空值，请修改后再提交!')
+        alertError(this, '错误', '数据列列表中存在空值，请修改后再提交!')
         return false
       }
       a = this.columnsData.filter(i => (i.length === 0 && i.type !== 'Integer' && i.type !== 'Date' && i.type !== 'DateTime' && i.type !== 'Text'))
       if (a.length > 0) {
         this.$refs.columns.$refs.table.setCurrentRow(a[0])
-        this.notifyError('数据列的长度不允许为零，请修改后再提交!')
+        alertError(this, '错误', '数据列的长度不允许为零，请修改后再提交!')
         return false
       }
       return true
@@ -343,9 +324,9 @@ export default {
           'columns': this.columnsData
         }
         updateTable(d).then(response => {
-          this.notifyMessage('提示', '保存成功！', 'success')
+          notifyMessage(this, 'success', '提示', '保存成功！')
         }).catch(error => {
-          this.notifyMessage('错误', '保存失败：' + error, 'error')
+          notifyMessage(this, 'error', '错误', '保存失败：' + error)
         })
       }
     },
@@ -366,11 +347,6 @@ export default {
     columnsUpdated(columnsData) {
       this.columnsData = columnsData
       this.updateDisabled = false
-    },
-    notifyError(title, text) {
-      this.infoDlg.title = title
-      this.infoDlg.text = text
-      this.infoDlgVisible = true
     },
     packExportXLSTemplate() {
       if (this.columnsData && this.columnsData.length > 0) {
@@ -397,7 +373,7 @@ export default {
         this.exportExcelVisible = true
       } else {
         this.exportExcelVisible = false
-        this.notifyMessage('错误', '导出模板前请先选择对应的数据表！', 'error')
+        notifyMessage(this, 'error', '错误', '导出模板前请先选择对应的数据表！')
       }
     },
     handleExportTemplate() {
@@ -430,31 +406,31 @@ export default {
           }
           updateTable(d).then(response => {
             jsonMappingToTable({ name: this.name, columns: this.columnsData }).then(response => {
-              this.notifyMessage('提示', '创建成功！', 'success')
+              notifyMessage(this, 'success', '提示', '创建成功！')
             }).catch(error => {
-              this.notifyMessage('错误', '创建失败：' + error, 'error')
+              notifyMessage(this, 'error', '错误', '创建失败：' + error)
             })
           }).catch(error => {
-            this.notifyMessage('错误', '创建失败：' + error, 'error')
+            notifyMessage(this, 'error', '错误', '创建失败：' + error)
           })
         })
       }
     },
     handleDumpTable() {
-      dumpTable({ name: this.name, truncate: this.truncate, data: this.uploadTableData }).then(response => {
+      dumpTable({ name: this.name, key: this.columnsData.filter(i => (i.primary_key === true)).map(i => (i.name)), truncate: this.truncate, data: this.uploadTableData }).then(response => {
         if (response.data) {
           const code = response.data.code
           const text = response.data.text
           if (code === 0) {
-            this.notifyMessage('提示', '写入成功！', 'success')
+            notifyMessage(this, 'success', '提示', '成功写入' + this.uploadTableData.length + '条数据！')
           } else {
-            this.notifyMessage('错误', '写入失败：' + text, 'error')
+            notifyMessage(this, 'error', '错误', '写入失败：' + text)
           }
         } else {
-          this.notifyMessage('提示', '写入失败！', 'error')
+          notifyMessage(this, 'error', '提示', '写入失败！')
         }
       }).catch(error => {
-        this.notifyMessage('错误', '写入失败：' + error, 'error')
+        notifyMessage(this, 'error', '错误', '写入失败：' + error)
       })
     },
     handleUpload() {

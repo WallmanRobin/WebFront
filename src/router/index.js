@@ -145,7 +145,7 @@ export const asyncRoutes = [
     alwaysShow: true, // will always show the root menu
     name: 'Tool',
     meta: {
-      title: '应用工具',
+      title: '系统工具',
       icon: 'tool'
     },
     children: [

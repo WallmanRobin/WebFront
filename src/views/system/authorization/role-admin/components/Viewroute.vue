@@ -24,10 +24,6 @@ export default {
 
   data() {
     return {
-      infoDlg: {
-        title: undefined,
-        text: undefined
-      },
       name: undefined,
       allVR: null,
       vrTree: null,

@@ -35,17 +35,13 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog :title="infoDlg.title" :visible.sync="infoDlgVisible" width="30%">
-      <span>{{ infoDlg.text }}</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="infoDlgVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
 <script>
 import { listRoles, getRoleTreeData } from '@/api/role-admin'
+import { alertError } from '@/utils'
+
 export default {
   props: {
     roleData: {
@@ -57,15 +53,10 @@ export default {
   },
   data() {
     return {
-      infoDlg: {
-        title: undefined,
-        text: undefined
-      },
       name: undefined,
       oldRoleData: null,
       allRoles: null,
       listLoading: true,
-      infoDlgVisible: false,
       addDlgVisible: false
     }
   },
@@ -80,17 +71,12 @@ export default {
         this.listLoading = false
       })
     },
-    showDupError(title, text) {
-      this.infoDlg.title = title
-      this.infoDlg.text = text
-      this.infoDlgVisible = true
-    },
     changeRole(row) {
       var a = this.roleData.filter(i => (i.role_code === row.role_code))
       if (a.length > 1) {
         var o = JSON.parse(JSON.stringify(this.oldRoleData))
         this.$emit('roleRowUpdated', o)
-        this.showDupError('Error', '角色列表中存在重复值，请修改后再提交！')
+        alertError(this, '错误', '角色列表中存在重复值，请修改后再提交！')
       } else {
         this.replaceRole(row)
         row.name = this.allRoles.filter(i => i.role_code === row.role_code)[0].name
@@ -175,7 +161,7 @@ export default {
           row.children = undefined
           const o = JSON.parse(JSON.stringify(this.roleData))
           this.$emit('roleRowUpdated', o)
-          this.showDupError('Error', '角色列表中存在重复值，请修改后再提交！')
+          alertError(this, '错误', '角色列表中存在重复值，请修改后再提交！')
         } else {
           row.role_code = row_role_code
           row.name = response.data.name

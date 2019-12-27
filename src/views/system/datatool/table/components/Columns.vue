@@ -45,35 +45,22 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog :title="infoDlg.title" :visible.sync="infoDlgVisible" width="30%">
-      <span>{{ infoDlg.text }}</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="infoDlgVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
 <script>
+import { alertError } from '@/utils'
+
 export default {
   props: { columns: { type: Array, default: function() { return [] } }, mode: { type: String, default: '' }},
   data() {
     return {
-      infoDlg: {
-        title: undefined,
-        text: undefined
-      },
       oldColumns: null,
       listLoading: false,
       infoDlgVisible: false
     }
   },
   methods: {
-    showDupError(title, text) {
-      this.infoDlg.title = title
-      this.infoDlg.text = text
-      this.infoDlgVisible = true
-    },
     changeColumn(row) {
       const a = this.columns.filter(i => (i.name === row.name))
       if (a.length <= 1) {
@@ -82,7 +69,7 @@ export default {
       } else {
         this.columns = JSON.parse(JSON.stringify(this.oldColumns))
         this.updateEmit()
-        this.showDupError('错误', '数据列列表中存在重复值，请修改后再提交!')
+        alertError(this, '错误', '数据列列表中存在重复值，请修改后再提交!')
       }
     },
     focusColumn(event) {

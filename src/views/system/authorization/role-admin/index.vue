@@ -98,12 +98,6 @@
         </keep-alive>
       </el-tab-pane>
     </el-tabs>
-    <el-dialog :title="infoDlg.title" :visible.sync="infoDlgVisible" width="30%">
-      <span>{{ infoDlg.text }}</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="infoDlgVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -112,6 +106,7 @@ import endpoint from './components/Endpoint'
 import viewroute from './components/Viewroute'
 import queryBtn from '@/components/QueryBtn'
 import { getRole, updateRole, listRoles } from '@/api/role-admin'
+import { notifyMessage, alertError } from '@/utils'
 
 export default {
   name: 'RoleAdmin',
@@ -122,10 +117,6 @@ export default {
         code: undefined,
         name: undefined
       },
-      infoDlg: {
-        title: undefined,
-        text: undefined
-      },
       code: undefined,
       name: undefined,
       status: undefined,
@@ -135,7 +126,6 @@ export default {
       endpointData: null,
       selVR: null,
       roleCodes: undefined,
-      infoDlgVisible: false,
       roleNames: undefined,
       roleList: [],
       selVisible: false,
@@ -229,14 +219,6 @@ export default {
     updateChanged() {
       this.updateDisabled = false
     },
-    notifyMessage(title, text, type) {
-      const h = this.$createElement
-      this.$notify({
-        type: type,
-        title: title,
-        message: h('i', { style: 'color: teal' }, text)
-      })
-    },
     validateEndpointData() {
       if (this.endpointData.length === 1 && !this.endpointData.endpoint) {
         return true
@@ -250,7 +232,7 @@ export default {
     },
     handleUpdate() {
       if (!this.validateEndpointData()) {
-        this.notifyError('后台服务列表中存在空值，请修改后再提交!')
+        alertError(this, '错误', '后台服务列表中存在空值，请修改后再提交!')
       } else {
         var s = this.$refs.viewroute.getSelVR()
         var d = {
@@ -261,9 +243,9 @@ export default {
           'viewroute': s
         }
         updateRole(d).then(response => {
-          this.notifyMessage('提示', '保存成功！', 'success')
+          notifyMessage(this, 'success', '提示', '保存成功！')
         }).catch(error => {
-          this.notifyMessage('错误', '保存失败：' + error, 'error')
+          notifyMessage(this, 'error', '错误', '保存失败：' + error)
         })
       }
     },
@@ -286,11 +268,6 @@ export default {
     },
     viewrouteUpdated(updated) {
       this.updateDisabled = false
-    },
-    notifyError(title, text) {
-      this.infoDlg.title = title
-      this.infoDlg.text = text
-      this.infoDlgVisible = true
     }
   }
 }
