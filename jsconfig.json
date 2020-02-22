@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "baseUrl": "/fc116",
-    "paths": {
-        "@/*": ["src/*"]
-    }
-  },
-  "exclude": ["node_modules", "dist"]
-}
